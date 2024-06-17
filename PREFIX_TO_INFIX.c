@@ -1,35 +1,35 @@
 #include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
 #include<ctype.h>
+#include<string.h>
 #define max 100
-void prefixtoinfix(char source[], char target[]) {
-    int i=0; 
-    int k=0;
+void postfixtoinfix(char source[],char target[])
+{
+    char temp[max],s[100][100];
     int len=strlen(source);
-    char temp[100], s1[100][30];
-    strcpy(target, "");
-    for(i=len-1;i>=0;i--) {
-        if (isalnum(source[i])) {
+    int i=0,k=0;
+    strcpy(target,"");
+    for(i=0;i<len;i++)
+    {
+        if(isalpha(source[i]))
+        {
             char t[]={source[i],'\0'};
-            strcpy(s1[k++], t);
-            
-        } else {
-            char *op1 = s1[--k]; 
-            char *op2 = s1[--k]; 
-            sprintf(temp, "(%s%c%s)", op1, source[i], op2);
-            strcpy(s1[k++], temp); 
-            
+            strcpy(s[k++],t);
         }
-    } 
-    strcpy(target, s1[--k]); 
+        else{
+            char *op2=s[--k];
+            char *op1=s[--k];
+            sprintf(temp,"(%s%c%s)",op1,source[i],op2);
+            strcpy(s[k++],temp);
+        }
+    }
+    strcpy(target,s[--k]);
 }
 int main()
 {
-    char prefix[max];
-    printf("Enter the prefix expression\n");
-    scanf("%s",prefix);
+    char postfix[max];
+    printf("Enter the postfix expression\n");
+    scanf("%s",postfix);
     char infix[max];
-    prefixtoinfix(prefix,infix);
+    postfixtoinfix(postfix,infix);
     printf("Infix expression is %s\n",infix);
-}*/
+}
