@@ -1,32 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Structure for a binary tree node
-struct Node {
+struct node {
     int data;
-    struct Node* left;
-    struct Node* right;
+    struct node *left;
+    struct node *right;
 };
 
-// Function to create a new node
-struct Node* createNode(int data) {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    if (newNode == NULL) {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
-    newNode->data = data;
-    newNode->left = NULL;
-    newNode->right = NULL;
-    return newNode;
+struct node *root = NULL;
+
+struct node *createnode(int data) {
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+    newnode->data = data;
+    newnode->left = NULL;
+    newnode->right = NULL;
+    return newnode;
 }
 
-// Function to insert a new node into the binary tree
-struct Node* insert(struct Node* root, int data) {
-    if (root == NULL) {
-        root = createNode(data);
+struct node *insert(struct node *root, int data) {
+    struct node *newnode = createnode(data);
+    if (root == NULL) { // Fix: == instead of =
+        root = createnode(data);
     } else {
-        if (data <= root->data) {
+        if (data < root->data) {
             root->left = insert(root->left, data);
         } else {
             root->right = insert(root->right, data);
@@ -35,19 +31,43 @@ struct Node* insert(struct Node* root, int data) {
     return root;
 }
 
+struct node *inorderpredecessor(struct node *root) {
+    root = root->left;
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    return root;
+}
 
-// Function to perform in-order traversal of the binary tree
-void inorderTraversal(struct Node* root) {
-    if (root != NULL) {
-        inorderTraversal(root->left);
+struct node *delnode(struct node *root, int data) {
+    struct node *ipre;
+    if (root == NULL) {
+        return NULL;
+    }
+    if (root->right == NULL && root->left == NULL) {
+        free(root);
+    }
+    if (data < root->data) {
+        root->left = delnode(root->left, data);
+    } else if (data > root->data) {
+        root->right = delnode(root->right, data);
+    } else {
+        ipre = inorderpredecessor(root);
+        root->data = ipre->data;
+        root->left = delnode(root->left, ipre->data);
+    }
+    return root;
+}
+
+void inorder(struct node *root) { // Fix: return type should be void
+    if (root != NULL) { // Fix: added null check
+        inorder(root->left);
         printf("%d ", root->data);
-        inorderTraversal(root->right);
+        inorder(root->right);
     }
 }
 
 int main() {
-    struct Node* root = NULL;
-
     // Insert elements into the binary tree
     root = insert(root, 50);
     root = insert(root, 30);
@@ -58,10 +78,12 @@ int main() {
     root = insert(root, 80);
 
     printf("In-order traversal of the binary tree: ");
-    inorderTraversal(root);
+    inorder(root);
     printf("\n");
-
-    
+    delnode(root,70);
+    printf("In-order traversal of the binary tree: ");
+    inorder(root);
+    printf("\n");
 
     return 0;
 }
